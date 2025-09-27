@@ -124,8 +124,12 @@
         let scene, camera, renderer, plane, isFlipped = false;
         let balance = Math.floor(Math.random() * 901) + 100; // Random between 100-1000
         let isAnimating = false;
+        let flipSound;
 
         function init() {
+            // Create flip sound using Web Audio API
+            createFlipSound();
+
             // Create scene
             scene = new THREE.Scene();
 
@@ -217,7 +221,32 @@
             flipImage(outcome, choice, betAmount, won);
         }
 
+        function createFlipSound() {
+            // Load flip sound from audio file
+            const audio = new Audio('flip-sound.mp3');
+            audio.preload = 'auto';
+
+            function playFlipSound() {
+                try {
+                    // Reset audio to beginning and play
+                    audio.currentTime = 0;
+                    audio.play().catch(e => {
+                        console.log('Audio playback failed:', e);
+                    });
+                } catch (e) {
+                    console.log('Audio not available');
+                }
+            }
+
+            flipSound = playFlipSound;
+        }
+
         function flipImage(outcome, playerChoice, betAmount, won) {
+            // Play flip sound
+            if (flipSound) {
+                flipSound();
+            }
+
             // Determine final rotation based on outcome
             const targetRotationY = outcome === 0 ? 0 : Math.PI; // 0 = heads, π = tails
             const startRotation = plane.rotation.y;
